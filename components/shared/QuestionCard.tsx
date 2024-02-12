@@ -66,8 +66,8 @@ export default function QuestionCard({
         <Metric
           imgUrl="/assets/icons/avatar.svg"
           alt="avatar"
-          value={author.name}
-          href={`/profile/${author.id}`}
+          value={author?.name}
+          href={`/profile/${author?.id}`}
           isAuthor
           title="- asked 1h ago"
           textStyles="text-dark400_light700 bodyl-medium"
