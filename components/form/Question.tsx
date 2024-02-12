@@ -51,7 +51,7 @@ export default function Question({mongoUserId}:props) {
         author: mongoUserId,
         path: pathName
       });
-       console.log('it went throught')
+     
       // navigate to home page to see the question
       router.push('/');
     } catch (error) {
