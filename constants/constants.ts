@@ -1,4 +1,5 @@
 import { SidebarLink } from "@/types";
+import { auth } from "@clerk/nextjs";
 
 export const themes = [
   { value: "light", label: "Light", icon: "/assets/icons/sun.svg" },
@@ -71,3 +72,25 @@ export const BADGE_CRITERIA = {
     GOLD: 100000,
   },
 };
+
+
+ export function getJoinedDate(dateObject: Date): string {
+  // Ensure the input is a valid Date object
+  if (!(dateObject instanceof Date) || isNaN(dateObject.getTime())) {
+      throw new Error("Invalid Date object provided");
+  }
+
+  // Get month and year from the Date object
+  const month: string = dateObject.toLocaleString('en-US', { month: 'short' });
+  const year: number = dateObject.getFullYear();
+
+  // Join month and year and return the result
+  const joinedDate: string = `${month} ${year}`;
+  return joinedDate;
+}
+
+// Example usage:
+const currentDate: Date = new Date();
+const result: string = getJoinedDate(currentDate);
+console.log(result); // Output: "Feb 2024"
+

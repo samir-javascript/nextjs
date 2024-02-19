@@ -2,7 +2,10 @@ import Link from "next/link";
 import React from "react";
 import RenderTags from "../shared/RenderTags";
 import { formatAndDivideNumber, getTimesTamp } from "@/lib/utils";
-import Metric from "./Metric";
+import Metric from "../shared/Metric";
+import { SignedIn, auth } from "@clerk/nextjs";
+import EditDeleteAction from "../shared/EditDeleteAction";
+
 
 interface CustomQuestionProps {
   id: string; // id of each individual question
@@ -10,18 +13,21 @@ interface CustomQuestionProps {
   title: string;
   upvotes: number;
   tags: {
-    id: string;
+    _id: string;
     name: string;
   }[];
   author: {
     name: string;
-    id: string;
+    _id: string;
     picture: string;
+    clerkId: string;
   };
   createdAt: Date;
+  clerkId?:string;
   answers: Array<object>;
 }
 export default function QuestionCard({
+ 
   id,
   views,
   title,
@@ -31,8 +37,13 @@ export default function QuestionCard({
   createdAt,
   answers,
 }: CustomQuestionProps) {
+ const { userId: clerkId } = auth()
+  const showActionButtons = clerkId && clerkId === author.clerkId;
+  console.log('CLERK ID' , clerkId)
+  console.log('AUTHOR ID', author.clerkId)
+ 
   return (
-    <div className="card-wrapper p-9 sm:px-11 rounded-[10px]">
+    <div className="card-wrapper p-9 sm:px-11  rounded-[10px]">
       <div
         className="flex flex-col-reverse
             justify-between items-start
@@ -55,23 +66,29 @@ export default function QuestionCard({
             </h3>
           </Link>
         </div>
+        <SignedIn>
+           {showActionButtons &&  (
+               <EditDeleteAction type='question' itemId={id} />
+           )} 
+        </SignedIn>
       </div>
       {/*  if signed in crud operation*/}
       <div className="flex flex-wrap mt-3.5 gap-2">
         {tags.map((tag) => (
-          <RenderTags key={tag.id} name={tag.name} _id={tag.id} />
+          <RenderTags key={tag._id} name={tag.name} _id={tag._id} />
         ))}
       </div>
       <div className="flex-between flex-wrap w-full mt-6 gap-3">
         <Metric
-          imgUrl="/assets/icons/avatar.svg"
+          imgUrl={author?.picture}
           alt="avatar"
           value={author?.name}
-          href={`/profile/${author?.id}`}
+          href={`/profile/${author?.clerkId}`}
           isAuthor
-          title="- asked 1h ago"
+          title={`- asked ${getTimesTamp(createdAt)} `}
           textStyles="text-dark400_light700 bodyl-medium"
         />
+        <div className="flex gap-3 items-center max-sm:flex-wrap max-sm:items-start">
         <Metric
           imgUrl="/assets/icons/like.svg"
           alt="vote"
@@ -93,6 +110,8 @@ export default function QuestionCard({
           title="views"
           textStyles="text-dark400_light900 small-medium"
         />
+        </div>
+        
       </div>
     </div>
   );

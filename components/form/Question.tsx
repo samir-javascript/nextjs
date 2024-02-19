@@ -20,21 +20,30 @@ import { Badge } from "../ui/badge";
 import Image from "next/image";
 
 import { useRouter, usePathname } from "next/navigation";
-import { createQuestion } from "@/lib/actions/question.action";
+import { createQuestion, editQuestion } from "@/lib/actions/question.action";
+import { useTheme } from "@/context/ThemeProvider";
+import { useToast } from "../ui/use-toast";
+
 interface props {
    mongoUserId: string;
+   type?: string;
+   questionDetails?: string;
 }
-export default function Question({mongoUserId}:props) {
+export default function Question({mongoUserId, type, questionDetails}:props) {
+  const { toast } = useToast()
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const  {mode }= useTheme()
   const editorRef = useRef(null);
   const router = useRouter();
   const pathName = usePathname();
+  const parsedQuestions = questionDetails ? JSON.parse(questionDetails) : {};
+  const groupedTags = parsedQuestions?.tags?.map((tag:any) => tag.name)
   const form = useForm<z.infer<typeof QuestionSchema>>({
     resolver: zodResolver(QuestionSchema),
     defaultValues: {
-      title: "",
-      explanation: "",
-      tags: [],
+      title: parsedQuestions.title || "",
+      explanation: parsedQuestions.content || "",
+      tags: groupedTags || [],
     },
   });
   // 2. Define a submit handler.
@@ -42,18 +51,34 @@ export default function Question({mongoUserId}:props) {
     setIsSubmitting(true);
   
     try {
-      // make an async call to your db api to create a question 
-      // that contains all form data 
-      await createQuestion({
-        title: values.title,
-        content: values.explanation,
-        tags: values.tags,
-        author: mongoUserId,
-        path: pathName
-      });
+      
+      if(type !== 'edit') {
+        await createQuestion({
+          title: values.title,
+          content: values.explanation,
+          tags: values.tags,
+          author: mongoUserId,
+          path: pathName
+        });
+        router.push('/');
+       return toast({
+          title:"question created",
+          description: 'your question has been created successfuly'
+        })
+       
+      }else {
+         await editQuestion({
+           title: values.title,
+           content: values.explanation,
+           path: pathName,
+           questionId: parsedQuestions._id
+         })
+         router.push(`/question/${parsedQuestions._id}`)
+      }
      
-      // navigate to home page to see the question
-      router.push('/');
+     
+     
+     
     } catch (error) {
       console.error('Error submitting question:', error);
     } finally {
@@ -87,11 +112,12 @@ export default function Question({mongoUserId}:props) {
       }
     }
   };
+  
   const handleRemoveTag = (tag: string, field: any) => {
     const newTags = field.value.filter((item: string) => item !== tag);
     form.setValue("tags", newTags);
   };
-  const type: any = "create";
+ 
   return (
     <Form {...form}>
       <form
@@ -115,6 +141,7 @@ export default function Question({mongoUserId}:props) {
                   "
                   placeholder="Enter your question"
                   {...field}
+                 
                 />
               </FormControl>
               <FormDescription className="body-regular mt-2.5 text-light-500">
@@ -145,7 +172,7 @@ export default function Question({mongoUserId}:props) {
                   }
                   onBlur={field.onBlur}
                   onEditorChange={(content) => field.onChange(content)}
-                  initialValue=""
+                  initialValue={parsedQuestions.content || ""}
                   
                   init={{
                     height: 350,
@@ -179,6 +206,8 @@ export default function Question({mongoUserId}:props) {
                       "alignright alignjustify | bullist numlist",
 
                     content_style: "body { font-family:Inter; font-size:16px;  background-light900_dark300 }",
+                    skin: mode === 'dark' ? 'oxide-dark' : 'oxide',
+                    content_css: mode === 'dark' ? 'dark' : 'light'
                   }}
                 />
               </FormControl>
@@ -194,6 +223,7 @@ export default function Question({mongoUserId}:props) {
         <FormField
           control={form.control}
           name="tags"
+          
           render={({ field }) => (
             <FormItem className="flex flex-col w-full">
               <FormLabel>
@@ -204,6 +234,7 @@ export default function Question({mongoUserId}:props) {
               <FormControl>
                 <>
                   <Input
+                  disabled={type === 'edit'}
                     className="no-focus paragraph-regular light-border-2 min-h-[56px]
                      background-light900_dark300 border text-dark300_light700 placeholder
                   "
@@ -221,14 +252,17 @@ export default function Question({mongoUserId}:props) {
                           key={tag}
                         >
                           {tag}
-                          <Image
+                          {type !== "edit" && (
+                            <Image
                             src="/assets/icons/close.svg"
                             width={12}
                             height={12}
                             alt="close icon"
                             className="cursor-pointer object-contain invert-0 dark:invert justify-self-end"
-                            onClick={() => handleRemoveTag(tag, field)}
+                            onClick={ type !== 'edit' ? () =>   handleRemoveTag(tag, field): ()=> {}}
                           />
+                          )}
+                          
                         </Badge>
                       ))}
                     </div>

@@ -1,14 +1,16 @@
-"use client";
+'use client'
 
 import Link from "next/link";
 import Image from "next/image";
-import React from "react";
 import { usePathname } from "next/navigation";
-import { SignedOut } from "@clerk/nextjs";
+import { SignedOut,  useAuth } from "@clerk/nextjs";
 import { Button } from "./ui/button";
 import { sidebarLinks } from "@/constants/constants";
 export default function LeftSideBar() {
+ 
+ 
   const PathName = usePathname();
+  const { userId  } = useAuth()
   return (
     <section
       className="flex flex-col justify-between pt-36 p-6 h-screen overflow-y-auto 
@@ -22,6 +24,13 @@ export default function LeftSideBar() {
           const isActive =
             (PathName.includes(item.route) && item.route.length > 1) ||
             PathName === item.route;
+            if(item.route === '/profile') {
+                if(userId) {
+                    item.route = `${item.route}/${userId}`
+                }else {
+                  return null;
+                }
+            }
           return (
             <Link 
              key={item.label}

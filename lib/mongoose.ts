@@ -1,3 +1,4 @@
+// @ts-ignore
 import mongoose from 'mongoose'
 let isConnected: boolean = false
 export const connectToDatabase = async ()=> {
@@ -11,7 +12,7 @@ export const connectToDatabase = async ()=> {
    }
    try {
       await mongoose.connect(process.env.NEXT_PUBLIC_MONGOOSE_API_KEY, {
-         dbName: 'developers-app'
+         dbName: 'developers-app',
       })
        isConnected = true
    } catch (error) {

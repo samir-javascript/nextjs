@@ -1,6 +1,6 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-
+import qs from 'query-string'
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -65,3 +65,36 @@ const formattedNumber = formatAndDivideNumber(largeNumber);
 
 // Now, you can use the formatted number and perform additional operations if needed.
 const dividedNumber = largeNumber / 1_000_000;
+interface URlQueryParams {
+   params: string;
+   key: string;
+   value: string | null;
+}
+export const formUrlQuery = ({params, key, value}:URlQueryParams)=> {
+      const currentUrl = qs.parse(params)
+      currentUrl[key] = value;
+      return qs.stringifyUrl({
+        url: window.location.pathname,
+        query: currentUrl
+      }, {
+        skipNull: true
+      })
+  }
+
+  interface RemoveURlQueryParams {
+    params: string;
+    keysToRemove: string[];
+   
+ }
+  export const removeKeysFromQuery = ({params, keysToRemove}:RemoveURlQueryParams)=> {
+    const currentUrl = qs.parse(params)
+    keysToRemove.forEach((key)=> {
+       delete currentUrl[key]
+    })
+    return qs.stringifyUrl({
+      url: window.location.pathname,
+      query: currentUrl
+    }, {
+      skipNull: true
+    })
+}

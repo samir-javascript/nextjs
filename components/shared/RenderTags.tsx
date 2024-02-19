@@ -16,14 +16,14 @@ export default function RenderTags({
     <Link href={`/tags/${_id}`} className="flex justify-between gap-3">
       <Badge
         className="subtle-medium
-       background-light800_dark300 rounded-md border-none
+          background-light800_dark300 rounded-md border-none
           px-4 py-2 uppercase text-light400_light500
        "
       >
         {name}
       </Badge>
-      {showCount && (
-        <p className="text-dark700_light700 small-medium">{totalQuestions}</p>
+      {showCount && totalQuestions !== 0 && (
+        <p className="text-light400_light500 small-medium">{totalQuestions}</p>
       )}
     </Link>
   );

@@ -1,3 +1,4 @@
+// @ts-ignore
 import { Schema, model, models, Document } from "mongoose";
 
 export interface IUser extends Document {
@@ -9,7 +10,7 @@ export interface IUser extends Document {
     location?: string;
     portfolioWebsite?: string;
     reputation?:number;
-    bio?: string;
+    bio?: string; 
     password?:string;
     saved: Schema.Types.ObjectId[];
     joinedAt: Date;
@@ -29,5 +30,5 @@ const UserSchema = new Schema({
    joinedAt: {type: Date, default : Date.now}
 
 })
-const User = models.User || model('User', UserSchema)
+const User = models?.User || model('User', UserSchema)
 export default User;

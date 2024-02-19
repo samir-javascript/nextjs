@@ -68,7 +68,8 @@ export default function MobileNavBar() {
       </SheetTrigger>
       <SheetContent
         side={"left"}
-        className={`background-light900_dark200 border-none max-h-screen overflow-y-auto scrollbar-hidden sm:hidden
+        className={`background-light900_dark200
+         border-none max-h-screen overflow-y-auto scrollbar-hidden sm:hidden
         }`}
       >
         <Link href={"/"} className="flex items-center gap-1">

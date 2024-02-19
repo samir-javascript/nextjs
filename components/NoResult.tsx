@@ -13,6 +13,7 @@ export default function NoResult({
   textButton,
   title,
   paragraph,
+  
   link,
 }: props) {
   return (

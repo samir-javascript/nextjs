@@ -1,20 +1,27 @@
 
 import NoResult from "@/components/NoResult";
-import QuestionCard from "@/components/shared/QuestionCard";
+import QuestionCard from "@/components/cards/QuestionCard";
+import Pagination from "@/components/shared/Pagination";
 import Filter from "@/components/shared/filters/Filter";
 import HomeFilter from "@/components/shared/filters/HomeFilter";
 import LocalSearchBar from "@/components/shared/search/LocalSearchBar";
 import { Button } from "@/components/ui/button";
 import { HomePageFilters } from "@/constants/filter";
 import { getQuestions } from "@/lib/actions/question.action";
+import { SearchParamsProps } from "@/types";
 
 import Link from "next/link";
+import Loading from "./loading";
 
 
-export default async function page() {
- 
-  const result = await getQuestions({})
-    console.log(result.questions)
+export default async function page({searchParams}:SearchParamsProps) {
+
+  const result = await getQuestions({
+    searchQuery: searchParams.q,
+    filter: searchParams.filter,
+    page: searchParams.page ? +searchParams.page : 1
+  })
+   console.log('QUESTIONS ARE HERE',result)
   
   
   return (
@@ -35,7 +42,7 @@ export default async function page() {
       </div>
 
       <div
-        className="mt-11 flex justify-between gap-5 sm:items-center
+        className="mt-11 w-full flex justify-between gap-5 sm:items-center
          max-sm:flex-col
       "
       >
@@ -51,18 +58,19 @@ export default async function page() {
           otherClasses={"min-h-[56px] sm:min-w-[170px]"}
           filters={HomePageFilters}
         />
+         </div>
         <HomeFilter filters={HomePageFilters} />
-      </div>
+     
 
       <div className="mt-10 w-full flex flex-col gap-6">
         {result.questions.length > 0 ? (
           result.questions.map((question) => (
             <QuestionCard
-              key={question.id}
-              id={question.id}
+              key={question._id}
+              id={question._id}
               views={question.views}
               title={question.title}
-              upvotes={question.upvotes}
+              upvotes={question.upvotes.length}
               tags={question.tags}
               author={question.author}
               answers={question.answers}
@@ -78,6 +86,9 @@ export default async function page() {
             textButton="ask a question"
           />
         )}
+      </div>
+      <div className="mt-10">
+          <Pagination isNext={result.isNext} pageNumber={searchParams.page ? +searchParams.page : 1} />
       </div>
     </>
   );
