@@ -37,10 +37,10 @@ const Answer = ({question, questionId, authorId}:props) => {
      if(!authorId) return;
       setIsSubmittingAi(true)
       try {
-         const response = await fetch(`${process.env.NEXT_SERVER_URL}/api/chatgpt`, {
-            method:'POST',
-            body: JSON.stringify({question})
-         })
+        const response = await fetch('https://nextjs-sand-iota-28.vercel.app/api/chatgpt', {
+          method: 'POST',
+          body: JSON.stringify({ question }),
+        });
          const aiAnswer = await response.json()
        //  alert(aiAnswer.reply)
          const formattedAnswer = aiAnswer.reply.replace(/\n/g, "<br />")
