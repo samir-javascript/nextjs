@@ -37,7 +37,7 @@ const Answer = ({question, questionId, authorId}:props) => {
      if(!authorId) return;
       setIsSubmittingAi(true)
       try {
-         const response = await fetch('http://localhost:3000/api/chatgpt', {
+         const response = await fetch(`${process.env.NEXT_SERVER_URL}/api/chatgpt`, {
             method:'POST',
             body: JSON.stringify({question})
          })
