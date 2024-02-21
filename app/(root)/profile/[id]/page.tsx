@@ -87,9 +87,11 @@ const page = async ({params, searchParams}:Props) => {
        />
        <div className='mt-10 flex gap-10'>
        <Tabs defaultValue="top-posts" className="flex-1">
-          <TabsList className='background-light800_dark400 p-1 min-h-[42px] '>
-             <TabsTrigger value="top-posts">Top Posts</TabsTrigger>
-             <TabsTrigger value="answers">Answers</TabsTrigger>
+          <TabsList className='  min-h-[42px] '>
+             <TabsTrigger className='px-6 py-3 rounded-lg focus:text-primary-500 focus:dark:!bg-light-700 !font-semibold focus:!bg-dark-400  body-medium capitalize shadow-none
+          background-light800_dark300 text-light-500 mr-2' value="top-posts">Top Posts</TabsTrigger>
+             <TabsTrigger className='px-6 py-3 rounded-lg focus:text-primary-500  focus:dark:!bg-light-700 !font-semibold focus:!bg-dark-400 body-medium capitalize shadow-none
+          background-light800_dark300 text-light-500' value="answers">Answers</TabsTrigger>
           </TabsList>
     <TabsContent className='flex flex-col gap-6  w-full' value="top-posts">
        <QuestionTab

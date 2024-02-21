@@ -16,6 +16,7 @@ export  async function createAnswer(params:CreateAnswerParams) {
          content, author, question
       })
       const questionObject =  await Question.findByIdAndUpdate(question, {$push: {answers: newAnswer._id}});
+      console.log('TAGS ARE HERE FROM BACKEND', questionObject.tags)
       await Interaction.create({
          question,
          tags: questionObject.tags,

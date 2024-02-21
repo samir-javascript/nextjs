@@ -5,6 +5,7 @@ import { GetAllTagsParams, GetQuestionsByTagIdParams, GetTopInteractedTagsParams
 // @ts-ignore
 import { FilterQuery } from "mongoose";
 import Question from '@/database/question.model'
+import Interaction from "@/database/interaction.model";
 
 export async function getTopInteractedTags(params:GetTopInteractedTagsParams) {
   const { userId } = params;
@@ -12,13 +13,10 @@ export async function getTopInteractedTags(params:GetTopInteractedTagsParams) {
     await connectToDatabase()
       const user = await User.findById(userId)
      if(!user)  throw new Error('user not found')
-      return  [{
-        _id: "1", name: 'tag1'
-      }, {
-        _id: "2", name: 'tag2'
-      }, {
-        _id: "3", name: 'tag3'
-      }]
+     const tags = await Interaction.findOne({user: userId})
+    .populate('tags', '_id name')
+    
+      return  { tags }
   } catch (error) {
       console.log(error)
       throw error;

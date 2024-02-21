@@ -7,20 +7,39 @@ import HomeFilter from "@/components/shared/filters/HomeFilter";
 import LocalSearchBar from "@/components/shared/search/LocalSearchBar";
 import { Button } from "@/components/ui/button";
 import { HomePageFilters } from "@/constants/filter";
-import { getQuestions } from "@/lib/actions/question.action";
+import { getQuestions, getRecommendedQuestions } from "@/lib/actions/question.action";
 import { SearchParamsProps } from "@/types";
 
 import Link from "next/link";
-import Loading from "./loading";
+import { auth } from "@clerk/nextjs";
 
 
 export default async function page({searchParams}:SearchParamsProps) {
-
-  const result = await getQuestions({
+  const { userId } = auth()
+  let result;
+  
+if(searchParams?.filter === 'recommended') {
+  if(userId) {
+     result =  await getRecommendedQuestions({
+      searchQuery: searchParams.q,
+      userId,
+      page: searchParams.page ? +searchParams.page : 1
+    })
+  }else {
+     result = {
+      questions: [],
+      isNext: false
+     }
+  }
+ 
+}else {
+   result =  await getQuestions({
     searchQuery: searchParams.q,
     filter: searchParams.filter,
     page: searchParams.page ? +searchParams.page : 1
   })
+}
+ 
    console.log('QUESTIONS ARE HERE',result)
   
   
@@ -63,8 +82,8 @@ export default async function page({searchParams}:SearchParamsProps) {
      
 
       <div className="mt-10 w-full flex flex-col gap-6">
-        {result.questions.length > 0 ? (
-          result.questions.map((question:any) => (
+        {result?.questions.length! > 0 ? (
+          result?.questions?.map((question:any) => (
             <QuestionCard
               key={question._id}
               id={question._id}
@@ -88,7 +107,7 @@ export default async function page({searchParams}:SearchParamsProps) {
         )}
       </div>
       <div className="mt-10">
-          <Pagination isNext={result.isNext} pageNumber={searchParams.page ? +searchParams.page : 1} />
+          <Pagination isNext={result?.isNext} pageNumber={searchParams.page ? +searchParams.page : 1} />
       </div>
     </>
   );

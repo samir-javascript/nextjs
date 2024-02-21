@@ -2,7 +2,7 @@
 import Question from "@/database/question.model";
 import { connectToDatabase } from "@/lib/mongoose"
 import Tag from "@/database/tag.model";
-import { CreateQuestionParams, DeleteQuestionParams, EditQuestionParams, GetQuestionByIdParams, GetQuestionsParams, QuestionVoteParams, SearchParams, ToggleSaveQuestionParams, UpdateUserParams, ViewQuestionParams } from "./shared";
+import { CreateQuestionParams, DeleteQuestionParams, EditQuestionParams, GetQuestionByIdParams, GetQuestionsParams, QuestionVoteParams, RecommendedParams, SearchParams, ToggleSaveQuestionParams, UpdateUserParams, ViewQuestionParams } from "./shared";
 import User from "@/database/user.model";
 import { revalidatePath } from "next/cache";
 import Interaction from "@/database/interaction.model";
@@ -205,15 +205,17 @@ export async function viewQuestion (params:ViewQuestionParams)  {
   try {
     const {questionId, userId } = params;
     await  connectToDatabase()
-    await Question.findOneAndUpdate({ _id: questionId }, { $inc: { views: 1 }});
+    const questionObject = await Question.findOneAndUpdate({ _id: questionId }, { $inc: { views: 1 }});
 
     if(userId) {
         const existingInteraction = await Interaction.findOne({user: userId, action: "view", question:questionId})
         if(existingInteraction) return console.log('user has already viewed');
+        console.log('TAGS FROM BACKEND V2', questionObject.tags)
         await Interaction.create({
              user: userId,
              action: "view",
-             question: questionId
+             question: questionId,
+             tags: questionObject.tags
         })
 
     }
@@ -333,5 +335,69 @@ export async function globalSearch(params:SearchParams) {
     } catch (error) {
         console.log(error);
         throw error;
+    }
+}
+
+
+export async function getRecommendedQuestions(params:RecommendedParams) {
+    try {
+      await connectToDatabase()
+      const { userId, page = 1 , pageSize = 10 , searchQuery} = params;
+      //find user
+      const user = await User.findOne({clerkId: userId})
+      if(!user) {
+        throw new Error('No user found')
+      }
+      const skipAmount = pageSize * (page - 1)
+      // find user's interactions;
+      const userInteractions = await Interaction.find({user: user._id})
+      .populate('tags')
+      .exec();
+       // extract tags from user's interactions;
+       const userTags = userInteractions.reduce((tags,interaction)=> {
+        if(interaction.tags) {
+          tags = tags.concat(interaction.tags)
+        }
+        return tags
+       }, [])
+       // get disticts tags ids from user interactions,
+       const distinctUserTagIds = [
+        // @ts-ignore
+        ...new Set(userTags.map((tag:any)=> tag?._id)),
+       ]
+       const query: FilterQuery<typeof Question> = {
+         $and: [
+          {
+            tags: {$in: distinctUserTagIds}
+          },
+          {
+            author: { $ne: user._id }
+          }
+         ]
+       };
+       if(searchQuery) {
+          query.$or = [
+            { title: {$regex: searchQuery, $options: "i"}},
+            { content: {$regex: searchQuery, $options: "i"}},
+          ]
+       }
+       const totalQuestions = await Question.countDocuments(query)
+       const recommendedQuestions = await Question.find(query)
+       .populate({
+        path: 'tags',
+        model: Tag
+       })
+       .populate({
+        path: "author",
+        model: User
+       })
+       .skip(skipAmount)
+       .limit(pageSize)
+       const isNext = totalQuestions > skipAmount + recommendedQuestions.length;
+       return {isNext, questions: recommendedQuestions}
+
+    } catch (error) {
+      console.log(error, "error getting recommended questions")
+      throw error;
     }
 }

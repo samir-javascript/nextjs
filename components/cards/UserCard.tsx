@@ -14,8 +14,10 @@ interface props {
         username: string;
      }
 }
+
 const UserCard = async ({user}:props) => {
     const topInteractedTags = await getTopInteractedTags({userId: user._id})
+    console.log('INTERACTED TAGS', topInteractedTags)
   return (
     <Link href={`/profile/${user.clerkId}`} 
     className="shadow-light100_darknone w-full max-xs:min-w-full xs:w-[260px]  "
@@ -30,9 +32,9 @@ const UserCard = async ({user}:props) => {
              </div> 
              <div className="mt-5">
 
-                 {topInteractedTags.length > 0 ? (
+                 {topInteractedTags?.tags?.tags.length > 0 && topInteractedTags.tags !== undefined ? (
                      <div className="flex items-center gap-2">
-                          {topInteractedTags.map(tag => (
+                          {topInteractedTags?.tags.tags.map((tag:any) => (
                              <RenderTags _id={tag._id} name={tag.name} key={tag._id} />
                           ))}
                      </div>
