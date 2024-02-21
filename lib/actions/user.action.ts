@@ -29,7 +29,7 @@ export async function getUserById(params:any){
 
 
 export async function getAllUsers(params:GetAllUsersParams) {
-   const { page = 1, pageSize = 2, searchQuery , filter} = params;
+   const { page = 1, pageSize = 10, searchQuery , filter} = params;
    
    const query:FilterQuery<typeof User> = {}
    const skipAmount = pageSize * (page - 1)

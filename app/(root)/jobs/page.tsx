@@ -25,7 +25,7 @@ const { jobs, loading } = jobsData(searchParams);
   "
   >
     <LocalSearchBar
-      placeholder="job title, Company or Keywords..."
+      placeholder="job title, Company.."
       imgSrc="/assets/icons/search.svg"
       iconPosition="left"
       otherClasses="flex-1"
