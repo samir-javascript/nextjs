@@ -12,12 +12,14 @@ interface CustomInputProps {
   otherClasses?: string;
   route: string;
   iconPosition: string;
+  
 }
 export default function LocalSearchBar({
   placeholder,
   imgSrc,
   otherClasses,
   route,
+  
   iconPosition,
 }: CustomInputProps) {
   const router = useRouter()
@@ -51,7 +53,7 @@ export default function LocalSearchBar({
   return (
     <Link href={route}>
       <div
-        className={`background-light800_darkgradient flex min-h-[56px] px-4 rounded-[10px]
+        className={`background-light800_darkgradient flex min-h-[56px]    px-4 rounded-[10px]
        gap-4 items-center grow ${otherClasses}
     `}
       >
@@ -68,7 +70,7 @@ export default function LocalSearchBar({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="border-none shadow-none no-focus text-dark400_light700  outline-none
-                 placeholder paragraph-regular bg-transparent
+                 placeholder paragraph-regular bg-transparent 
                  
              "
         />

@@ -2,7 +2,7 @@
 import { downvoteAnswer, upvoteAnswer } from '@/lib/actions/answer.actions';
 
 import { downvoteQuestion, toggleSaveQuestion, upvoteQuestion, viewQuestion } from '@/lib/actions/question.action';
-
+import { useToast } from '../ui/use-toast';
 
 import Image from 'next/image';
 import { usePathname, useRouter } from 'next/navigation';
@@ -23,7 +23,7 @@ const Votes = ({type, itemId, downvotes, upvotes, hasDownvoted, hasUpvoted, hasS
     const router  = useRouter()
     console.log('QUESTION id' , itemId)
     const pathname = usePathname()
-    
+    const { toast } = useToast()
     const handleVote = async (action: string) => {
        
     
@@ -36,6 +36,10 @@ const Votes = ({type, itemId, downvotes, upvotes, hasDownvoted, hasUpvoted, hasS
                     hasdownVoted: hasDownvoted,
                     hasupVoted: hasUpvoted
                 });
+                return toast({
+                    title: 'upvote successful',
+                    description: 'you have upvoted this question successfuly'
+                })
             } else if (type === 'answer') {
                 await upvoteAnswer({
                     path: pathname,
@@ -44,6 +48,10 @@ const Votes = ({type, itemId, downvotes, upvotes, hasDownvoted, hasUpvoted, hasS
                     hasdownVoted: hasDownvoted,
                     hasupVoted: hasUpvoted
                 });
+                return toast({
+                    title: 'upvote successful',
+                    description: 'you have upvoted this answer successfuly'
+                })
             }
         } else if (action === 'downvote') {
             if (type === 'question') {
@@ -54,6 +62,11 @@ const Votes = ({type, itemId, downvotes, upvotes, hasDownvoted, hasUpvoted, hasS
                     hasdownVoted: hasDownvoted,
                     hasupVoted: hasUpvoted
                 });
+                return toast({
+                    title: 'downvote successful',
+                    description: 'you have downvoted this question successfuly',
+                    variant:"destructive"
+                })
             } else if (type === 'answer') {
                 await downvoteAnswer({
                     path: pathname,
@@ -62,6 +75,11 @@ const Votes = ({type, itemId, downvotes, upvotes, hasDownvoted, hasUpvoted, hasS
                     hasdownVoted: hasDownvoted,
                     hasupVoted: hasUpvoted
                 });
+                return toast({
+                    title: 'downvote successful',
+                    description: 'you have downvoted this anwser successfuly',
+                    variant: "destructive"
+                })
             }
         }
     };
@@ -87,11 +105,16 @@ const Votes = ({type, itemId, downvotes, upvotes, hasDownvoted, hasUpvoted, hasS
    
     const handleSave = async () => {
         try {
+           
             await toggleSaveQuestion({
                 userId,
                 questionId: itemId,
                 path: pathname
             });
+            return toast({
+                title: hasSaved ? 'question removed from your collection' : 'question saved in your collection' ,
+                variant: hasSaved ? "destructive" : 'default' 
+            })
         } catch (error) {
             console.error('Error toggling save:', error);
         }

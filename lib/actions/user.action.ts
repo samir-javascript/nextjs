@@ -109,7 +109,7 @@ export async function getSavedQuestions(params:GetSavedQuestionsParams) {
    
    try {
        await connectToDatabase()
-       const { clerkId, page = 1, pageSize = 1, filter, searchQuery } = params;
+       const { clerkId, page = 1, pageSize = 10, filter, searchQuery } = params;
        const skipAmount = pageSize * (page - 1)
        const query:FilterQuery<typeof Question> = {}
        if (searchQuery) {
@@ -190,7 +190,7 @@ export async function getSavedQuestions(params:GetSavedQuestionsParams) {
 
  export async function getUserQuestions(params:GetUserStatsParams) {
     try {
-      const { userId, page = 1 , pageSize = 2 } = params;
+      const { userId, page = 1 , pageSize = 10 } = params;
       connectToDatabase()
       const skipAmount = pageSize * (page - 1)
       const totalQuestions = await Question.countDocuments({author: userId})
@@ -215,7 +215,7 @@ export async function getSavedQuestions(params:GetSavedQuestionsParams) {
 
  export async function getUserAnswers(params: GetUserStatsParams) {
    try {
-     const { userId, page = 1, pageSize = 2 } = params;
+     const { userId, page = 1, pageSize = 10} = params;
  
     await connectToDatabase(); 
      const skipAmount = pageSize * (page - 1)
@@ -237,6 +237,7 @@ export async function getSavedQuestions(params:GetSavedQuestionsParams) {
      throw new Error('No answers found');
    }
    const isNext = totalAnswers > skipAmount + answers.length;
+   
    
    return { answers, totalAnswers , isNext};
    } catch (error) {

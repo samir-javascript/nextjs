@@ -11,10 +11,12 @@ import {
 } from "@/components/ui/select";
 import { useSearchParams, useRouter } from "next/navigation";
 import { formUrlQuery } from "@/lib/utils";
+import Image from "next/image";
 
 interface props {
   otherClasses?: string;
   containerClasses?: string;
+  icon?: string;
   filters: {
     name: string;
     value: string;
@@ -24,6 +26,7 @@ export default function Filter({
   otherClasses,
   containerClasses,
   filters,
+  icon
 }: props) {
   const searchParams = useSearchParams()
  
@@ -48,7 +51,8 @@ export default function Filter({
            light-border px-5 py-2.5 text-dark500_light700
         `}
         >
-          <div className="flex-1 text-left line-clamp-1 ">
+          <div className="flex-1  text-left line-clamp-1 ">
+           
             <SelectValue placeholder="Select a Filter" />
           </div>
         </SelectTrigger>

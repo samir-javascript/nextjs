@@ -70,7 +70,7 @@ const AnswerCard = ({_id, question, author,  clerkId,  upvotes, downvotes, creat
           href={`/profile/${author?._id}`}
           isAuthor
           title={`- asked ${getTimesTamp(createdAt)} `}
-          textStyles="text-dark400_light700 bodyl-medium"
+          textStyles="text-dark400_light700 body1-medium"
         />
         <Metric
           imgUrl="/assets/icons/like.svg"

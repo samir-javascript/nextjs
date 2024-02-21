@@ -11,7 +11,7 @@ import User from "@/database/user.model";
 export  async function createAnswer(params:CreateAnswerParams) {
     try { 
        await connectToDatabase()
-      const { content,  author, path, question} = params;
+      const { content,  author, path, question } = params;
       const newAnswer = await  Answer.create({
          content, author, question
       })
@@ -23,8 +23,9 @@ export  async function createAnswer(params:CreateAnswerParams) {
          answer: newAnswer._id,
          action:"answer"
       })
+      // increment user's reputation by 10 for creating an answer;
        await User.findByIdAndUpdate(author,  { $inc: {reputation: 10}})
-      revalidatePath(path)
+       revalidatePath(path)
      
     } catch (error) {
       console.error('Error while creating an answer :', error);
@@ -35,25 +36,28 @@ export  async function createAnswer(params:CreateAnswerParams) {
   export  async function getQuestionAnswers(params:GetAnswersParams) {
     try { 
        await connectToDatabase()
-      const { questionId , sortBy, page = 1 , pageSize = 2} = params;
+      const { questionId , sortBy, page = 1 , pageSize = 10} = params;
       let sortOptions = {}
       const skipAmount = pageSize * (page - 1)
       switch (sortBy) {
         case "highestupvotes":
           sortOptions = { upvotes: -1}
           break;
-          case "lowestupvotes":
+        case "lowestupvotes":
             sortOptions = { upvotes: 1}
-            break;
-            case "recent":
+          break;
+        
+          case "recent":
               sortOptions = { createdAt: -1}
-              break;
-              case "old":
+          break;
+          
+          case "old":
                 sortOptions = { createdAt: 1}
-                break;
+          break;
         default:
           break;
       }
+     
         const answers = await Answer.find({question: questionId})
         .populate("author", '_id, name picture clerkId')
         .sort(sortOptions)
@@ -69,6 +73,49 @@ export  async function createAnswer(params:CreateAnswerParams) {
       throw new Error('Failed to fetch answers from the database');
     }
   }
+
+
+
+
+export async function getAnswers(params:GetAnswersParams) {
+   try {
+     const { questionId, page = 1, pageSize = 10, sortBy } = params;
+     let sortOptions = {}
+    switch (sortBy) {
+      case 'highestupvotes':
+        sortOptions = {upvotes: -1}
+        break;
+      case 'lowestupvotes':
+        sortOptions = {upvotes: 1}
+        break;
+      case 'recent':
+          sortOptions = {createdAt: -1}
+          break;
+      case 'old':
+         sortOptions = {createdAt: 1}
+            break;
+      default:
+        break;
+    }
+     
+     const skipAmount = pageSize * (page - 1)
+     const answers = await Answer.find({question: questionId})
+     .populate('author', '_id clerkId name picture')
+     .limit(pageSize)
+     .skip(skipAmount)
+     .sort(sortOptions)
+     const totalAnswers = await Answer.countDocuments({question:questionId})
+     const isNext = totalAnswers > skipAmount + answers.length;
+     return { answers, isNext}
+   } catch (error) {
+      console.log(error)
+      throw error;
+   }
+}
+
+
+
+
 
   export async function upvoteAnswer(params:AnswerVoteParams) {
     try {
@@ -89,6 +136,7 @@ export  async function createAnswer(params:CreateAnswerParams) {
       if(!answer) {
         throw new Error('Answer not found')
       }
+      // increment user's reputation by 2 for upvoting an answer and decrement it by 2 for downvoting;
       await User.findByIdAndUpdate(userId, {$inc: { reputation: hasupVoted ? -2 : 2 }})
       await User.findByIdAndUpdate(answer.author, {$inc: { reputation: hasupVoted ? -12 : 12 }})
       revalidatePath(path)
@@ -142,3 +190,4 @@ export  async function createAnswer(params:CreateAnswerParams) {
  }
 
  
+

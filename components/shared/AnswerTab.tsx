@@ -12,7 +12,7 @@ interface props {
 
 const AnswerTab = async({clerkId, searchParams, userId}:props) => {
   const result = await getUserAnswers({userId, page: searchParams.page ? +searchParams.page : 1})
-  console.log('USER ANSWERS', result)
+ 
   return (
     <>
          {result.answers.map((item:any) => (
