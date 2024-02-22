@@ -28,7 +28,6 @@ const UserSchema = new Schema({
    reputation: {type: Number,  default: 0},
    saved: [{type: Schema.Types.ObjectId , ref: 'Question'}], // which question has been saved
    joinedAt: {type: Date, default : Date.now}
-
 })
 const User = models?.User || model('User', UserSchema)
 export default User;

@@ -77,7 +77,7 @@ export default function LeftSideBar() {
                 width={24}
                 height={24}
               />
-              <span className="primary-text-gradient capitalize max-lg:hidden">
+              <span className="primary-text-gradient font-semibold capitalize max-lg:hidden">
                 log in
               </span>
             </Button>
@@ -97,7 +97,7 @@ export default function LeftSideBar() {
                 width={24}
                 height={24}
               />
-              <span className="text-dark-400_light-900 capitalize max-lg:hidden">
+              <span className="primary-text-gradient font-semibold capitalize max-lg:hidden">
                 sign up
               </span>
             </Button>

@@ -210,7 +210,7 @@ export async function viewQuestion (params:ViewQuestionParams)  {
     if(userId) {
         const existingInteraction = await Interaction.findOne({user: userId, action: "view", question:questionId})
         if(existingInteraction) return console.log('user has already viewed');
-        console.log('TAGS FROM BACKEND V2', questionObject.tags)
+       
         await Interaction.create({
              user: userId,
              action: "view",
